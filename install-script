@@ -9,21 +9,20 @@ DGRAY='\033[1;30m'
 NC='\033[0m' # No Color
 
 MOUNT_LOCATION=/mnt/gentoo
-TIMEZONE=Asia/Dubai
+TIMEZONE=America/Los Angeles 
 
 CFLAGS="-march=haswell -O2 -pipe"
 CPU_FLAGS="aes avx fma3 mmx mmxext popcnt sse sse2 sse3 sse4_1 sse4_2 ssse3"
 USE_FLAGS="X acl bindist mmx sse sse2 -suid -kde -qt4 sna dri pulseaudio alsa dbus"
 MAKE_OPTIONS="-j9"
 
-BIOS_PARTITION=/dev/sda1
-BOOT_PARTITION=/dev/sda2
-SWAP_PARTITION=/dev/sda3
-ROOT_PARTITION=/dev/sda4
+BOOT_PARTITION=/dev/sda1
+SWAP_PARTITION=/dev/sda2
+ROOT_PARTITION=/dev/sda3
 
-ROOT_FS_TYPE=btrfs
+ROOT_FS_TYPE=ext4
 
-STAGE3=stage3/stage3*
+STAGE3=stage3/$LATEST
 KERNEL_CONFIG_FILE=$(pwd)/kernel-configs/.config-gentoo #kernel config file is optimized for my particular system you will have to modify it for your system
 
 HOSTNAME="gentoo"
@@ -81,7 +80,7 @@ install_gentoo_prep ()
   command cd $MOUNT_LOCATION
 
   message "Extracting stage3 tarball"
-  command tar xvjpf stage3-*.tar.bz2 --xattrs
+  command tar xpvf $STAGE3 --xattrs-include='*.*' --numeric-owner
 
   message "Copying configuration files"
   command mkdir -pv ${MOUNT_LOCATION}/etc
@@ -226,7 +225,7 @@ EOF
 # NOTE: If your BOOT partition is ReiserFS, add the notail option to opts.
 ${BOOT_PARTITION}               /boot           vfat            noauto,noatime  1 2
 ${SWAP_PARTITION}               none            swap            sw              0 0
-${ROOT_PARTITION}               /               btrfs           noatime,ssd,compress=lzo,clear_cache            0 0
+${ROOT_PARTITION}               /               ext4           noatime,compress=lzo,clear_cache            0 0
 EOF
 
   message "Setting Hostname"
